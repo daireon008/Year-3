@@ -1,0 +1,195 @@
+#include <stdio.h> 
+#include "t2.h"
+#include <stdlib.h>
+#include "t1.h"
+
+
+//Fills the array with ascending, consecutive numbers, starting from 0.
+void fill_ascending(int *array, int size)
+{
+    //TODO
+  for(int i = 0;i<size;i++){
+    array[i] = i;
+  }
+    
+}
+//Fills the array with descending numbers, starting from size-1
+void fill_descending(int *array, int size)
+{
+    //TODO
+  for(int i=0;i<size;i++){
+    array[i] = size-i-1;
+  }
+}
+
+//Fills the array with uniform numbers.
+void fill_uniform(int *array, int size)
+{
+    //TODO
+    for(int i = 0;i<size;i++){
+      array[i] = size/2;
+    }
+}
+
+//Fills the array with random numbers within 0 and size-1. Duplicates are allowed.
+void fill_with_duplicates(int *array, int size)
+{
+    //TODO
+  for(int i = 0;i<size;i++){
+    array[i] = rand()%size;
+  }
+    
+}
+
+
+//Fills the array with unique numbers between 0 and size-1 in a shuffled order. Duplicates are not allowed.
+void fill_without_duplicates(int *array, int size)
+{
+    //TODO
+  //come up with random number
+  //go down each previous number in array
+  //if number is in array, check goes to 0
+  //else repeat with different random num
+  int check = 0;
+  for(int i = 0;i<size;i++){
+    int j = rand()%size;//get random number
+    check = 0;
+    while(check == 0){//keep looping until unique random number
+      j = rand()%size;
+      check = 1;
+      for(int k = 0;k<i;k++){//go through all array numbers
+        if(array[k]==j){//if number is not unique keep looping
+          check = 0;
+        }
+        }
+    }
+      array[i] = j;
+  }
+}
+
+void printArray(int* arr, int size){
+  int i;
+  for(i=0; i<size;i++){
+    printf("%d ", arr[i]);
+  }
+  printf("\n");
+}
+
+int number_comparisons = 0;
+int number_swaps = 0;
+
+
+void selectionSort(int arr[], int size) 
+{ 
+  //TODO
+  //pointer at array position
+  //says its the lowest num
+  //two for loops iterating up array
+
+  for(int i = 0;i<size;i++){
+    int value = arr[i];
+    int position = i;
+    for(int j = i+1;j<size;j++){
+      if(arr[j]<value){
+        value = arr[j];
+        position = j;
+      }
+    }
+    arr[position] = arr[i];
+    arr[i] = value;
+  }
+} 
+
+void insertionSort(int arr[], int size) 
+{ 
+  //TODO
+  //1 for loop goinf up
+  //while loop in for loop going down until end
+  //for loop checks position and position plus 1
+  //pos+1 value is checked all the way down array if needed
+
+  for(int i = 1;i<size;i++){  //goes up array until end
+    int j = i-1;  //checks value of the previous positions
+    int value = arr[i];//value of higher value
+    int position = i;//position of higher value
+    int check = 0;
+    while(j>=0 && j<size && check == 0){  //goes down array until end of fixed array
+      if(value<arr[j]){//array out of order
+        //swap values
+        int k = arr[j];
+        arr[j] = value;
+        arr[position] = k;
+        //check is still 0
+        check = 0;
+        //update position and value
+        position--;
+        value = arr[position];
+        //j goes down array
+        j--;
+        }
+      else{//array is in order
+        //check is 1
+        check = 1;
+      }
+      }
+    }
+  
+}
+
+
+int partition(int arr[], int start, int end){
+
+  int pivot = arr[end];//pivot is end index
+  int low = start - 1;//comes from left
+  for(int i = start;i <= end - 1; i++){//compare elements in array with pivot
+    if(arr[i] < pivot){
+      low++;//if smaller than pivot -> swap with bigger num
+      //swap low and high
+      int k = arr[low];
+      arr[low] = arr[i];
+      arr[i] = k;
+    }
+  }
+  //reposition pivot to correct place
+  int kk = arr[low+1];
+  arr[low+1] = arr[end];
+  arr[end] = kk;
+
+  return low+1;//return pivot position
+
+}
+
+
+void quick_sort(int arr[], int p, int r){
+  //first partition
+  //second do the lower values
+  //third do the higher values
+  //p and r are first and last index
+  if(p < r){
+    int q = partition(arr,p,r);
+    quick_sort(arr,p,q-1);
+    quick_sort(arr,q+1,r);
+    }
+}
+
+
+void quickSort(int arr[], int size) 
+{ 
+  //needs two more functions
+  quick_sort(arr,0,size-1);//first index is 0, last index is size-1
+  
+}
+
+
+int main(){
+
+int size = 17;
+int array[size];
+  fill_without_duplicates(array,size);
+  printArray(array,size);
+  quickSort(array,size);
+  printArray(array,size);
+  
+  
+  return 0;
+}
