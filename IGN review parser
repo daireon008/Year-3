@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_BUFFER 256 // Maximum string length this program can handle
+//#define MAX_NB_game 15626// Maximum number of games
+int MAX_NB_game = 18626;
+
+struct game {
+	int score,year;
+	char title[MAX_BUFFER], platform[MAX_BUFFER];
+};
+
+// The CSV parser
+int
+next_field( FILE *f, char *buf, int max ) {
+	int i=0, end=0, quoted=0;
+	
+	for(;;) {
+		// fetch the next character from file		
+		buf[i] = fgetc(f);
+		// if we encounter quotes then flip our state and immediately fetch next char
+		if(buf[i]=='"') { quoted=!quoted; buf[i] = fgetc(f); }
+		// end of field on comma if we're not inside quotes
+		if(buf[i]==',' && !quoted) { break; }
+		// end record on newline or end of file
+		if(feof(f) || buf[i]=='\n') { end=1; break; } 
+		// truncate fields that would overflow the buffer
+		if( i<max-1 ) { ++i; } 
+	}
+
+	buf[i] = 0; // null terminate the string
+	return end; // flag stating whether or not this is end of the line
+}
+
+
+void fetch_game (  FILE *csv, struct game *p) {
+	char buf[MAX_BUFFER];
+
+//	next_field( csv, buf, MAX_BUFFER );      // load id into buffer as string
+//	p->id = atoi(buf);                       // then parse to integer
+
+	next_field( csv, p->title, MAX_BUFFER ); 
+	next_field( csv, p->platform, MAX_BUFFER ); 
+	
+	next_field( csv, buf, MAX_BUFFER );
+	p->score = atoi(buf);  
+	next_field( csv, buf, MAX_BUFFER ); 
+	p->year = atoi(buf);                   
+}
+
+void print_game( struct game *p ) {
+	printf("%s  %s %d %d", p->title, p->platform, p->score, p->year);
+}
+
+int main(int argc, char *argv[] ){
+  FILE *f;
+  struct game *pArray[MAX_NB_game];
+  struct game p;
+  struct game *pp;
+
+  f = fopen("t4_ign.csv","r");
+
+  fetch_game(f,&p);
+
+  int num_games = 0;
+  while(!feof(f)){
+    pArray[num_games] = malloc(sizeof(struct game));
+    fetch_game(f,pArray[num_games]);
+    //print_game(pArray[num_games]);
+    //printf("\n");
+    
+    num_games++;
+  }
+  num_games--;
+  
+  fclose(f);
+
+  int size = num_games;
+  //arr[] = pArray[]
+  for(int i = 0;i<size;i++){
+    int index = i;
+    for(int j = i+1;j<size;j++){
+      if(pArray[index]->score < pArray[j]->score){
+        index = j;
+      }
+    }
+    //swap
+    pp = pArray[index];
+    pArray[index] = pArray[i];
+    pArray[i] = pp;
+  }
+  
+  for(int k = num_games;k>0;k--){
+    if(pArray[k]->score == 1){
+    print_game(pArray[k]);
+    printf("\n");
+      }
+  }
+
+  return 0;
+}
